@@ -1,0 +1,299 @@
+{
+  "stage1": {
+    "customer_context": "Hartwell & Co. is a commercial real estate firm where the Marketing department (led by VP Elena) and Research department (led by Director Sam) both run manual, high-volume document and information-request processes for brokers. Data already lives in structured systems (Postgres property database, research warehouse, demographics API) but assembly and status-tracking are entirely manual, creating bottlenecks and confidentiality risks tied to per-listing access restrictions.",
+    "workflows": [
+      {
+        "id": "offering-memorandum-production",
+        "name": "Offering Memorandum (OM) Production",
+        "department": "Marketing",
+        "pain": "Every listing requires a 30+ page branded document manually assembled in InDesign from photos, rent rolls, comps, demographics, and financials by a team of six; average turnaround is 5 business days across 340/year, and brokers complain constantly.",
+        "people": [
+          "Elena's marketing team (6 people)",
+          "Brokers"
+        ],
+        "systems": [
+          "InDesign",
+          "Postgres (property/listings db)",
+          "research data warehouse",
+          "demographics vendor REST API"
+        ],
+        "champion": {
+          "name": "Elena",
+          "role": "VP Marketing",
+          "evidence": "Offering memorandums are the bottleneck... My team of six produces them by hand in InDesign."
+        },
+        "evidence_quote": "Every listing needs one: property photos, rent rolls, comps, demographic data, financial summaries, all assembled into a branded 30-plus page document."
+      },
+      {
+        "id": "listing-status-requests",
+        "name": "Listing Collateral Status Requests",
+        "department": "Marketing",
+        "pain": "Brokers email or call marketing roughly 30 times a day asking where their collateral is in the production queue, pulling staff off actual production work.",
+        "people": [
+          "Elena's marketing team",
+          "Brokers"
+        ],
+        "systems": [
+          "Email/phone (informal)",
+          "internal production queue (implied, no system of record)"
+        ],
+        "champion": {
+          "name": "Elena",
+          "role": "VP Marketing",
+          "evidence": "Someone on my team answers roughly 30 of those a day instead of doing actual work."
+        },
+        "evidence_quote": "Brokers email or call marketing to ask where their collateral is in the queue."
+      },
+      {
+        "id": "comp-report-generation",
+        "name": "Comparable Sales (Comp) Report Generation",
+        "department": "Research",
+        "pain": "Brokers request comparable sales for pitches; two analysts manually run the same ~8 queries with different addresses, format results into a PDF, and send it back, consuming roughly half their week.",
+        "people": [
+          "2 research analysts",
+          "Brokers"
+        ],
+        "systems": [
+          "research data warehouse"
+        ],
+        "champion": {
+          "name": "Sam",
+          "role": "Research Director",
+          "evidence": "Two analysts spend maybe half their week on it. It is the same eight queries with different addresses."
+        },
+        "evidence_quote": "Brokers ask for comparable sales for a pitch, we run the query, format a PDF, send it back."
+      },
+      {
+        "id": "proposal-pitch-tracker",
+        "name": "Proposal / Pitch Tracker",
+        "department": "Marketing",
+        "pain": "Pitch and proposal tracking currently lives in a color-coded spreadsheet understood only by one senior coordinator, creating a single point of failure and no visibility for others.",
+        "people": [
+          "Marcus (senior coordinator)",
+          "Marketing team",
+          "Brokers (implied stakeholders in pitches)"
+        ],
+        "systems": [
+          "spreadsheet"
+        ],
+        "champion": {
+          "name": "Marcus",
+          "role": "Senior Coordinator",
+          "evidence": "Proposal tracking for pitches, currently a color-coded spreadsheet that only our senior coordinator, Marcus, understands."
+        },
+        "evidence_quote": "Proposal tracking for pitches, currently a color-coded spreadsheet that only our senior coordinator, Marcus, understands."
+      },
+      {
+        "id": "listing-photo-asset-requests",
+        "name": "Listing Photo Asset Requests",
+        "department": "Marketing",
+        "pain": "Photo assets for listings are requested and shared via a shared drive with no organization or access control, described as chaotic.",
+        "people": [
+          "Marketing team",
+          "Brokers"
+        ],
+        "systems": [
+          "shared drive"
+        ],
+        "champion": null,
+        "evidence_quote": "listing photo asset requests (shared drive chaos)"
+      }
+    ]
+  },
+  "stage2": {
+    "scored": [
+      {
+        "id": "offering-memorandum-production",
+        "scores": {
+          "impact": 90,
+          "data_readiness": 55,
+          "governance_simplicity": 45,
+          "champion_strength": 90,
+          "overall": 72
+        },
+        "rationales": {
+          "impact": "340 OMs/year tie up a six-person team for 5 business days each and are the direct source of chronic broker complaints, making this the highest revenue-adjacent bottleneck in the portfolio.",
+          "data_readiness": "Source systems are named and structured (Postgres, research warehouse, demographics API) but final assembly happens in InDesign, meaning the workflow spans four disparate systems and a design tool that resists straightforward automation.",
+          "governance_simplicity": "OMs bundle financials, rent rolls, and comps with per-listing confidentiality restrictions, so any automation must respect access controls, adding approval and security review layers.",
+          "champion_strength": "Elena, VP Marketing, explicitly names this as her team's core bottleneck and owns the six-person production team, giving strong sponsorship and urgency."
+        }
+      },
+      {
+        "id": "listing-status-requests",
+        "scores": {
+          "impact": 55,
+          "data_readiness": 35,
+          "governance_simplicity": 80,
+          "champion_strength": 85,
+          "overall": 61
+        },
+        "rationales": {
+          "impact": "About 30 interruptions a day pull marketing staff off production work, so fixing it recovers meaningful capacity, though it doesn't directly touch revenue or error risk the way OM production does.",
+          "data_readiness": "There is no named system of record for production status today, only email and phone, so a queue/status system would need to be built rather than connected to something existing.",
+          "governance_simplicity": "Status information is low-sensitivity and internal, so this can ship with minimal approvals once a lightweight tracking layer exists.",
+          "champion_strength": "Elena again identifies this as a direct drain on her team and is already motivated to fix it, making her a ready-made owner and internal reference."
+        }
+      },
+      {
+        "id": "comp-report-generation",
+        "scores": {
+          "impact": 80,
+          "data_readiness": 85,
+          "governance_simplicity": 70,
+          "champion_strength": 85,
+          "overall": 80
+        },
+        "rationales": {
+          "impact": "Two analysts spend roughly half their week running the same eight queries for broker pitches, so automation frees substantial skilled headcount tied directly to deal support.",
+          "data_readiness": "The workflow lives entirely in one structured research data warehouse with a repeatable, well-defined query pattern, making it the most connectable and template-able process in the set.",
+          "governance_simplicity": "Comp sales data is less sensitive than full financials or per-listing restricted materials and touches a single system, so it can move through review quickly.",
+          "champion_strength": "Sam, Research Director, names this pain directly and quantifies the analyst time lost, indicating clear ownership and motivation to sponsor a pilot."
+        }
+      },
+      {
+        "id": "proposal-pitch-tracker",
+        "scores": {
+          "impact": 45,
+          "data_readiness": 40,
+          "governance_simplicity": 85,
+          "champion_strength": 60,
+          "overall": 55
+        },
+        "rationales": {
+          "impact": "The tracker prevents a single point of failure risk since only one coordinator understands it, but no volume or dollar impact is cited, so the upside is more about resilience than throughput.",
+          "data_readiness": "The process currently lives in an ad hoc color-coded spreadsheet with no named external system to connect to, requiring the data model to be built from scratch.",
+          "governance_simplicity": "This is a purely internal tracking tool with no confidential listing data, so it faces minimal governance friction to replace.",
+          "champion_strength": "Marcus, the senior coordinator, is named and clearly invested since he is the single point of failure, but he lacks the department-level authority Elena or Sam have."
+        }
+      },
+      {
+        "id": "listing-photo-asset-requests",
+        "scores": {
+          "impact": 35,
+          "data_readiness": 30,
+          "governance_simplicity": 50,
+          "champion_strength": 10,
+          "overall": 32
+        },
+        "rationales": {
+          "impact": "Described only as 'shared drive chaos' with no volume, turnaround, or cost figures given, suggesting real but currently unquantified and likely lower-priority pain.",
+          "data_readiness": "Assets sit in an unorganized shared drive with no structure, metadata, or access rules, requiring significant groundwork before any workflow could connect to it.",
+          "governance_simplicity": "Photo assets intersect with the same per-listing confidentiality restrictions noted elsewhere, so access control work is needed even though the content itself is not highly sensitive.",
+          "champion_strength": "No champion is named for this workflow, leaving no one accountable to push it forward or validate a pilot."
+        }
+      }
+    ],
+    "rollout": [
+      {
+        "phase": "Days 1-14: First win",
+        "items": [
+          "comp-report-generation"
+        ],
+        "champion_moves": "Have Sam publicly sponsor a scoped pilot covering just the top 3-4 most common comp queries against the research warehouse, producing an auto-formatted PDF for one active broker pitch to create an immediate before/after story.",
+        "proof_metric": "Analyst hours spent per comp report drop from ~half a week per request pattern to near-instant generation, measured across the first 10-15 requests fulfilled through the new flow."
+      },
+      {
+        "phase": "Days 15-45: Proof and pull",
+        "items": [
+          "offering-memorandum-production",
+          "listing-status-requests"
+        ],
+        "champion_moves": "Use the comp-report win to bring Elena in as co-sponsor; start OM automation on the structured data feeds (Postgres, warehouse, demographics API) for one property type first while manually handling InDesign branding, and simultaneously stand up a simple shared status view fed by the same production data to kill the 30-a-day broker check-ins.",
+        "proof_metric": "OM assembly time for the pilot property type drops from 5 business days toward 1-2 days, and broker status inquiries to marketing staff fall from ~30/day to near zero for piloted listings."
+      },
+      {
+        "phase": "Days 46-90: Department expansion",
+        "items": [
+          "proposal-pitch-tracker",
+          "listing-photo-asset-requests"
+        ],
+        "champion_moves": "Bring Marcus in to co-design a structured replacement for his spreadsheet so the tracker is no longer a single point of failure, and use the momentum from OM/status wins to justify a governance pass on photo asset access control before rolling out an organized, permissioned asset workflow.",
+        "proof_metric": "Pitch tracking becomes accessible to at least 3 additional team members beyond Marcus, and photo asset requests are resolved through a structured, access-controlled system with a documented reduction in ad hoc search/request time."
+      }
+    ]
+  },
+  "stage3": {
+    "use_case_id": "comp-report-generation",
+    "clark_prompt": "Build an internal tool for the Research team that automates Comparable Sales (Comp) Report generation for brokers. Today two analysts manually re-run the same roughly eight queries against the @ResearchWarehouse for each broker request, then hand-format the results into a PDF and email it back, consuming about half their week. The tool should connect directly to @ResearchWarehouse as the single source of comp sales data (transaction records, addresses, sale prices, price per square foot, closing dates, property type). Build three views: (1) a Request Intake view where an analyst enters or pastes a broker's request (property address or list of addresses, deal context, requested comp radius/date range) and selects from the standard set of ~8 saved query templates; (2) a Report Preview view that runs those queries against @ResearchWarehouse, surfaces the results in an editable table so the analyst can remove outliers, adjust rounding, or add notes before finalizing; (3) a Report Library view showing past generated reports, who requested them, and when they were sent, so analysts and Sam can spot repeat requests or reuse recent pulls. The human-in-the-loop points are: an analyst must review and approve the pulled comp data in the Preview view before any PDF is generated or sent (no fully automated send-to-broker step), and Sam, as Research Director, should periodically review and approve changes to the underlying query templates so the standard 8 queries stay accurate as the data model evolves. Output should be a branded, consistently formatted PDF that mirrors the firm's current comp report layout. Before you build, give me a plan covering the data model for pulling from @ResearchWarehouse, the screens/interactions above, and where the analyst review checkpoint sits in the flow.",
+    "integrations": [
+      {
+        "integration": "Research Data Warehouse",
+        "shared_to_group": "Research Department",
+        "access_level": "Developer",
+        "why": "Analysts and Sam need query-building and template-editing access to run and maintain the ~8 standard comp queries against live warehouse data."
+      },
+      {
+        "integration": "Research Data Warehouse",
+        "shared_to_group": "Marketing/Broker-facing staff (view-only)",
+        "access_level": "End user",
+        "why": "Front-line staff who intake broker requests need read-only access to trigger report generation without direct query access to the underlying warehouse."
+      }
+    ],
+    "rbac_notes": [
+      {
+        "role": "Research Analyst",
+        "who": "The two research analysts",
+        "why": "Needs to run queries, edit results in the Preview view, and generate/send final PDFs; this is the primary daily operator role."
+      },
+      {
+        "role": "Research Director (Approver)",
+        "who": "Sam",
+        "why": "Owns and approves changes to the standard query templates and reviews report volume/quality trends via the Report Library view."
+      },
+      {
+        "role": "Requester (Broker-facing)",
+        "who": "Marketing/brokerage staff submitting requests on behalf of brokers",
+        "why": "Needs to submit a comp request and view report status/history but should not have direct access to raw warehouse data or query editing."
+      }
+    ],
+    "knowledge_files": [
+      {
+        "filename": "research_warehouse_schema_guidance.md",
+        "level": "Integration",
+        "body": "# Research Warehouse Schema Guidance\n\n- Comp sales data lives in the research data warehouse; treat it as the single source of truth for comp report queries.\n- Core fields to expect: property address, sale price, sale date, price per square foot, property type, and square footage.\n- The 8 standard comp queries should be treated as reusable templates, not ad hoc SQL rewritten per request; version and label them clearly (e.g., 'Comp-Query-01: Same submarket, last 12 months').\n- Always parameterize queries by address/geography and date range rather than hardcoding values, since every request only varies these inputs.\n- Do not join comp warehouse data with per-listing restricted marketing data (rent rolls, financials); those are governed separately and out of scope for this workflow.\n- Flag any query returning zero or very sparse results back to the analyst rather than auto-generating a report, since sparse comps need manual judgment.\n- When adding new query templates, document the business question they answer so future analysts understand intent, not just SQL."
+      },
+      {
+        "filename": "comp_report_workflow_pattern.md",
+        "level": "App",
+        "body": "# Comp Report Generation Workflow Pattern\n\n- Flow: Intake request -> Run standard query templates -> Analyst reviews/edits results -> Generate PDF -> Send to broker -> Log in Report Library.\n- Never skip the analyst review step; results must be checked for outliers or stale comps before a PDF is produced, even though queries run automatically.\n- Each request should capture: requesting broker/deal context, target address(es), and which of the 8 templates were used, so patterns in demand are visible over time.\n- The Report Library should be searchable by address and date so analysts can quickly check if a similar comp pull was done recently, reducing duplicate work.\n- Turnaround target for this workflow is near-instant generation once a request is submitted, not same-day; design the intake-to-preview step to complete in seconds, not minutes.\n- Template changes (adding/editing one of the 8 standard queries) should route to Sam for approval before going live, since these are shared across all analysts."
+      },
+      {
+        "filename": "comp_report_pdf_design_standards.md",
+        "level": "App",
+        "body": "# Comp Report PDF Design Standards\n\n- Generated PDFs should mirror the firm's existing comp report layout so brokers see no disruption in format from the manual process.\n- Standard sections: cover header with requesting broker's name and date, comparable sales table, price-per-square-foot summary, and a notes/caveats section for analyst-added context.\n- Keep tables sortable by sale date and price per square foot in the underlying data view, but the exported PDF should present them in a clean, print-ready static table.\n- Include a visible 'Generated on [date] by [analyst]' footer for traceability, since these reports go directly to brokers and external-facing pitch materials.\n- Avoid including any fields not part of the standard comp data set (no rent roll or financial data) to keep this workflow's output distinct from Offering Memorandum materials."
+      },
+      {
+        "filename": "listing_data_confidentiality_notes.md",
+        "level": "Org",
+        "body": "# Listing Data Confidentiality Notes\n\n- Hartwell & Co. enforces per-listing access restrictions across property and deal data; not all staff can see all listings.\n- Comp sales data in the research warehouse is generally lower-sensitivity than per-listing financials or rent rolls, but reports should still only include information the requesting broker is authorized to see.\n- Do not blend comp warehouse data with restricted marketing materials (financial summaries, rent rolls) in any single automated workflow without an explicit governance review.\n- When building tools that touch listing-adjacent data, default to least-privilege access and confirm with a department lead (Sam for Research, Elena for Marketing) before expanding visibility across teams."
+      }
+    ],
+    "metrics": [
+      {
+        "metric": "Analyst hours spent per comp report",
+        "target": "Reduce from ~half a week (aggregate across 2 analysts) to near-instant generation per request",
+        "how_measured": "Compare analyst time logs/self-reported hours before and after rollout across the first 10-15 requests fulfilled through the new flow."
+      },
+      {
+        "metric": "Comp report turnaround time",
+        "target": "From request submission to broker-ready PDF in under 10 minutes including analyst review",
+        "how_measured": "Timestamp comparison between Intake submission and final PDF send logged in the Report Library."
+      },
+      {
+        "metric": "Requests fulfilled through new flow vs. manual process",
+        "target": "100% of new comp requests routed through the tool within first 30 days",
+        "how_measured": "Count of reports generated in Report Library vs. Sam's estimate of total broker comp requests received."
+      },
+      {
+        "metric": "Analyst edit rate before send",
+        "target": "Track and keep manual overrides/outlier removals visible, not eliminate them",
+        "how_measured": "Percentage of generated Preview results that are edited before PDF generation, logged per report."
+      },
+      {
+        "metric": "Query template stability",
+        "target": "Zero unapproved changes to the 8 standard query templates",
+        "how_measured": "Audit log of template edits cross-checked against Sam's approval records."
+      }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #fafaf8;
+  --color-ink: #141518;
+  --color-secondary: #5b667a;
+  --color-hairline: #e4e4df;
+  --color-cobalt: #2440c9;
+  --color-shipped: #0e8a5f;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+/* paper texture for knowledge file cards */
+.paper-texture {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(20, 21, 24, 0.025) 1px,
+    transparent 0
+  );
+  background-size: 14px 14px;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.animate-bar {
+  transform-origin: left;
+  animation: bar-grow 300ms ease-out both;
+}
+
+.animate-check {
+  animation: check-pop 300ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bar,
+  .animate-check {
+    animation: none;
+  }
+}

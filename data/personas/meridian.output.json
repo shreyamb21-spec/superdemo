@@ -1,0 +1,285 @@
+{
+  "stage1": {
+    "customer_context": "Meridian Voyages is a cruise operator where nearly every cross-department process runs on spreadsheets, email, and text message workarounds, creating multi-day delays, manual reconciliation labor, and ungoverned handling of guest PII and financial data. IT Platform Lead Marcus is focused on proving a governance story (access control, audit visibility) before any app rolls out, while Director of Guest Operations Dana is prioritizing guest recovery and the excursion capacity tracker as the workflows with the most visible pain and organizational appetite.",
+    "workflows": [
+      {
+        "id": "guest-recovery-case-tracking",
+        "name": "Guest Recovery Case Management",
+        "department": "Guest Operations",
+        "pain": "Cases (missed excursions, cabin issues, etc.) are logged in a shared Excel tracker and resolved via email ping-pong between ship team, shoreside guest relations, and finance for compensation approval. Guests wait four to six days for resolutions that should take one, and the tracker containing guest PII is forwarded around uncontrolled.",
+        "people": [
+          "Ship team",
+          "Shoreside guest relations",
+          "Finance (compensation approval)"
+        ],
+        "systems": [
+          "Excel tracker",
+          "Outlook/email",
+          "Salesforce (guest profiles)"
+        ],
+        "champion": null,
+        "evidence_quote": "The tracker has guest PII in a file that gets forwarded around. That is my nightmare. ... A guest waits four to six days for an answer that should take one."
+      },
+      {
+        "id": "crew-shift-swap-reconciliation",
+        "name": "Crew Shift-Swap Reconciliation",
+        "department": "Crew Operations / Payroll",
+        "pain": "Shift swaps onboard are texted to a coordinator who manually updates a per-ship workbook; payroll then manually reconciles these at month end, costing roughly two full days per month per ship.",
+        "people": [
+          "Ship coordinator",
+          "Payroll team"
+        ],
+        "systems": [
+          "Per-ship workbooks",
+          "Text messages",
+          "Postgres (crew and scheduling)"
+        ],
+        "champion": null,
+        "evidence_quote": "Payroll says roughly two full days per month per ship just reconciling."
+      },
+      {
+        "id": "port-agent-document-intake",
+        "name": "Port Agent Document Intake",
+        "department": "Operations",
+        "pain": "Port agents email PDFs of berth confirmations and provisioning manifests, and the ops team manually retypes them into the planning sheet, roughly 40 documents per week.",
+        "people": [
+          "Port agents",
+          "Ops team"
+        ],
+        "systems": [
+          "Email (PDFs)",
+          "Planning sheet"
+        ],
+        "champion": null,
+        "evidence_quote": "Port agents email PDFs of berth confirmations and provisioning manifests, and our ops team retypes them into the planning sheet."
+      },
+      {
+        "id": "excursion-capacity-sellthrough",
+        "name": "Excursion Capacity & Sell-Through Tracker",
+        "department": "Revenue / Operations",
+        "pain": "A single analyst (Priya) owns a 19-tab workbook that tracks real-time sell-through by sailing and capacity caps by tender availability; when she is on leave the whole process freezes, and revenue relies on this workbook to feed a weekly revenue deck.",
+        "people": [
+          "Priya (analyst)",
+          "Revenue team",
+          "Ops team (capacity/tender availability)"
+        ],
+        "systems": [
+          "19-tab Excel workbook",
+          "Snowflake (bookings, revenue)"
+        ],
+        "champion": {
+          "name": "Priya",
+          "role": "Analyst",
+          "evidence": "She has literally asked us to replace it with something."
+        },
+        "evidence_quote": "The excursion capacity tracker... today it is a 19-tab workbook one analyst named Priya owns. When Priya is on leave the whole thing freezes."
+      },
+      {
+        "id": "onboard-incident-escalation-log",
+        "name": "Onboard Incident Escalation Log",
+        "department": "Guest Operations / Safety",
+        "pain": "Onboard incidents are logged in a SharePoint list that is rarely updated, indicating a broken or abandoned escalation process for tracking incidents.",
+        "people": [
+          "Ship team",
+          "Guest operations"
+        ],
+        "systems": [
+          "SharePoint list"
+        ],
+        "champion": null,
+        "evidence_quote": "onboard incident escalation log (SharePoint list, rarely updated)"
+      }
+    ]
+  },
+  "stage2": {
+    "scored": [
+      {
+        "id": "guest-recovery-case-tracking",
+        "scores": {
+          "impact": 90,
+          "data_readiness": 65,
+          "governance_simplicity": 40,
+          "champion_strength": 55,
+          "overall": 67
+        },
+        "rationales": {
+          "impact": "Guests wait four to six days for resolutions that should take one, and finance compensation approvals sit inside the same broken chain, making this a direct revenue-and-reputation issue Dana already flags as top pain.",
+          "data_readiness": "Systems are named and partly structured (Salesforce holds guest profiles, Excel tracker holds cases), but the workflow spans three disconnected tools and email, so integration work is real though feasible.",
+          "governance_simplicity": "This is explicitly Marcus's 'nightmare' scenario: uncontrolled PII forwarding plus a finance approval step means more access-control and audit layers before shipping.",
+          "champion_strength": "No individual owner is named, but Dana as Director of Guest Operations is organizationally championing it, giving executive air cover without a hands-on operational hero yet."
+        }
+      },
+      {
+        "id": "crew-shift-swap-reconciliation",
+        "scores": {
+          "impact": 65,
+          "data_readiness": 70,
+          "governance_simplicity": 75,
+          "champion_strength": 30,
+          "overall": 61
+        },
+        "rationales": {
+          "impact": "Two full days per month per ship in manual payroll reconciliation is a recurring, quantifiable labor cost that scales across the fleet, though it lacks the guest-facing urgency of other workflows.",
+          "data_readiness": "A Postgres system of record for crew and scheduling already exists behind the manual workbooks, giving a clear structured target to connect into versus starting from scratch.",
+          "governance_simplicity": "Crew and payroll data carries far less sensitivity than guest PII, and there's no compensation-approval or guest-relations layer, so this should clear governance faster.",
+          "champion_strength": "No named owner is mentioned; payroll and ship coordinators feel the pain but no one has stepped up as a visible sponsor."
+        }
+      },
+      {
+        "id": "port-agent-document-intake",
+        "scores": {
+          "impact": 55,
+          "data_readiness": 45,
+          "governance_simplicity": 85,
+          "champion_strength": 25,
+          "overall": 52
+        },
+        "rationales": {
+          "impact": "Roughly 40 documents a week retyped by hand is meaningful labor drag, but it's an internal efficiency play without PII, safety, or revenue exposure attached.",
+          "data_readiness": "Inputs are unstructured PDFs arriving over email with no named downstream system beyond a 'planning sheet,' so extraction/parsing work is needed before this is plug-and-play.",
+          "governance_simplicity": "No guest or financial data is involved, so this is about as low-risk and fast-to-approve as workflows get here.",
+          "champion_strength": "No individual has been named as invested in fixing this, making it a good technical candidate but a weak momentum play on its own."
+        }
+      },
+      {
+        "id": "excursion-capacity-sellthrough",
+        "scores": {
+          "impact": 85,
+          "data_readiness": 80,
+          "governance_simplicity": 70,
+          "champion_strength": 90,
+          "overall": 82
+        },
+        "rationales": {
+          "impact": "The workbook is a single point of failure that freezes revenue reporting whenever Priya is out, and it directly feeds the weekly revenue deck, making this a visible business-continuity and revenue-integrity risk.",
+          "data_readiness": "Snowflake already holds bookings and revenue data behind the workbook, giving a clean, structured backend to build against rather than scraping unstructured inputs.",
+          "governance_simplicity": "Data is internal revenue/ops information rather than guest PII, so it should clear review faster than guest-facing workflows, though it still touches financial reporting.",
+          "champion_strength": "Priya is named, motivated, and has explicitly asked to be replaced by something better, making her an ideal visible hero for a fast first win."
+        }
+      },
+      {
+        "id": "onboard-incident-escalation-log",
+        "scores": {
+          "impact": 50,
+          "data_readiness": 30,
+          "governance_simplicity": 50,
+          "champion_strength": 15,
+          "overall": 38
+        },
+        "rationales": {
+          "impact": "Incident tracking touches guest and crew safety, which matters, but the fact that the log is 'rarely updated' suggests the process itself may be abandoned rather than merely slow, clouding the real impact.",
+          "data_readiness": "A SharePoint list with low usage gives little structured signal to build from, and no other systems are named as sources of truth.",
+          "governance_simplicity": "Safety and incident data can carry compliance weight, but with no active process or stakeholders pushing it, the review path is more uncertain than clearly simple.",
+          "champion_strength": "No one is named as owning or caring about this workflow, and the neglected state of the log itself is evidence no champion currently exists."
+        }
+      }
+    ],
+    "rollout": [
+      {
+        "phase": "Days 1-14: First win",
+        "items": [
+          "excursion-capacity-sellthrough"
+        ],
+        "champion_moves": "Make Priya the visible hero: have her co-design the replacement for her own 19-tab workbook and demo live sell-through numbers to leadership within the first two weeks. Use her explicit ask to replace the tool as the opening story, and let Marcus validate the governance model (access control, audit log) on this lower-sensitivity revenue data before it touches guest PII.",
+        "proof_metric": "Real-time capacity/sell-through dashboard replaces manual workbook updates, and the process no longer freezes during Priya's next leave; time-to-refresh the weekly revenue deck drops from a manual multi-hour pull to on-demand."
+      },
+      {
+        "phase": "Days 15-45: Proof and pull",
+        "items": [
+          "guest-recovery-case-tracking",
+          "crew-shift-swap-reconciliation"
+        ],
+        "champion_moves": "Recruit Dana as executive sponsor for a scoped guest-recovery pilot (start with one ship or route to limit PII exposure), and pair a payroll lead as co-owner of the crew shift-swap fix. Reuse the access-control and audit-log pattern proven in Phase 1 to fast-track Marcus's governance sign-off on the more sensitive guest data.",
+        "proof_metric": "Guest recovery case resolution time drops from 4-6 days to under 24 hours with a fully audited PII trail; crew shift-swap reconciliation time drops from ~2 days/month/ship to under a few hours."
+      },
+      {
+        "phase": "Days 46-90: Department expansion",
+        "items": [
+          "port-agent-document-intake",
+          "onboard-incident-escalation-log"
+        ],
+        "champion_moves": "Use Phase 1 and 2 metrics as the pitch to recruit first-time champions in Operations and Safety, since neither workflow currently has a named owner. Position these as lower-risk, low-PII wins to expand the platform's footprint into new departments without adding governance complexity.",
+        "proof_metric": "Port agent document retyping volume cut by ~90% with automated intake; onboard incident log shows consistent real-time updates with a full audit trail instead of stale entries."
+      }
+    ]
+  },
+  "stage3": {
+    "use_case_id": "excursion-capacity-sellthrough",
+    "clark_prompt": "Build a real-time Excursion Capacity & Sell-Through Tracker that replaces the 19-tab Excel workbook currently owned solely by Priya, our revenue analyst. Pull live bookings and revenue data from @Snowflake (the existing source of truth behind the workbook) to calculate sell-through by sailing and remaining capacity by tender availability. Give me three views: (1) a Sailing Overview grid showing each upcoming sailing with booked vs. capacity numbers and a sell-through percentage, color-coded when a sailing is nearing its tender-capacity cap; (2) a Sailing Detail view showing excursion-level breakdowns, tender constraints, and a trend line of sell-through over the last 30 days; (3) a Weekly Revenue Deck Export view that lets the revenue team pull a formatted snapshot on demand instead of waiting for Priya's manual pull. Priya should have edit rights to adjust capacity caps and flag data discrepancies before they hit the dashboard — that's a human-in-the-loop checkpoint before any capacity override goes live. The revenue team should have a second human-in-the-loop step: reviewing and confirming numbers before the weekly deck export is finalized, since this feeds leadership reporting. Marcus, our IT Platform Lead, needs to review and validate the access-control model and audit log (who viewed what, who changed capacity caps, when) before this rolls out further, since this is our first proof point for the governance story ahead of touching guest PII in later workflows. Everything should be readable at a glance for Ops and Revenue with no manual spreadsheet manipulation required. Before you build anything, give me a plan covering the data model against @Snowflake, the three views, the override/approval flow for Priya, the export flow for the revenue team, and how audit logging will work for Marcus's review.",
+    "integrations": [
+      {
+        "integration": "Snowflake",
+        "shared_to_group": "Revenue & Ops",
+        "access_level": "End user",
+        "why": "Snowflake already holds bookings and revenue data behind the current workbook, so it's the structured backend the dashboard pulls sell-through and capacity numbers from in real time."
+      },
+      {
+        "integration": "Snowflake",
+        "shared_to_group": "IT Platform (Marcus)",
+        "access_level": "Developer",
+        "why": "Marcus needs developer-level visibility into the Snowflake connection and query structure to validate the governance/audit model before this pattern extends to guest PII workflows."
+      }
+    ],
+    "rbac_notes": [
+      {
+        "role": "Analyst / Editor",
+        "who": "Priya",
+        "why": "As the current workbook owner and named champion, she needs edit rights to configure capacity caps and correct data discrepancies before they surface to leadership, preserving her human-in-the-loop role during the transition."
+      },
+      {
+        "role": "Viewer",
+        "who": "Revenue team and Ops team (capacity/tender availability)",
+        "why": "They consume sell-through and capacity data to inform the weekly revenue deck and tender planning but should not alter capacity logic directly, keeping a single accountable editor."
+      },
+      {
+        "role": "Governance Admin",
+        "who": "Marcus (IT Platform Lead)",
+        "why": "He owns validating the access-control and audit-log model on this lower-sensitivity dataset first, establishing the governance pattern that will later gate the guest-PII workflows."
+      }
+    ],
+    "knowledge_files": [
+      {
+        "filename": "snowflake_bookings_revenue_schema.md",
+        "level": "Integration",
+        "body": "# Snowflake Bookings & Revenue Schema Guidance\n\n- Source system: Snowflake, holding bookings and revenue data that previously fed the 19-tab Excel workbook.\n- Expect a bookings table keyed by sailing_id with fields for excursion_id, guest_count, booking_status, and booking_date.\n- Revenue figures should be joined at the sailing_id level, not the guest level, to match how the weekly revenue deck is structured today.\n- Tender/capacity caps are likely stored separately (per sailing, per excursion) — confirm whether this lives in Snowflake or was only tracked in the workbook, and if the latter, plan a migration step.\n- Sell-through percentage = booked_count / capacity_cap; always compute this live rather than caching, since capacity caps can be edited by the analyst.\n- Treat sailing_id as the primary join key across all views (Sailing Overview, Sailing Detail, Weekly Export).\n- Flag any nulls in capacity_cap as a data quality issue requiring analyst review before display, not silent exclusion.\n- This is internal revenue/ops data, not guest PII — do not conflate with Salesforce guest profile data used in the guest recovery workflow."
+      },
+      {
+        "filename": "excursion_tracker_workflow_patterns.md",
+        "level": "App",
+        "body": "# Excursion Capacity Tracker — Workflow Patterns\n\n- Primary goal: eliminate single-point-of-failure risk from the workbook owned solely by Priya.\n- Sailing Overview view is the default landing screen — sorted by soonest departure date, with sell-through % as the primary sort/filter dimension.\n- Sailing Detail view drills into a single sailing: excursion-level bookings, tender constraints, and a 30-day sell-through trend.\n- Capacity cap edits are a human-in-the-loop action restricted to the analyst role (currently Priya) — never allow automated overwrites of capacity caps from raw Snowflake data without her review.\n- Weekly Revenue Deck Export view must support an on-demand pull, replacing the manual multi-hour extraction process — this is the core proof metric for this rollout phase.\n- Color-code sailings approaching capacity caps (e.g., >90% sell-through) to mirror how Priya currently flags risk manually in the workbook.\n- Do not merge this workflow's data model with the crew shift-swap or guest recovery workflows — keep sailing/revenue data isolated per the governance-simplicity rationale from scoring."
+      },
+      {
+        "filename": "governance_access_audit_standards.md",
+        "level": "Org",
+        "body": "# Governance & Audit Standards (Org-Wide)\n\n- Every app must support role-based access control with at minimum three tiers: Editor, Viewer, and Governance Admin.\n- All edits to sensitive or business-critical fields (e.g., capacity caps, compensation approvals, guest data) must be logged with user, timestamp, and prior value — no silent overwrites.\n- Governance Admin role (currently held by Marcus, IT Platform Lead) must have visibility into the full audit trail for any app before it expands to a second department or touches PII.\n- Lower-sensitivity, internal-data workflows (e.g., revenue/ops data) should be used to prove the access-control and audit-log pattern before extending the same pattern to guest-PII workflows.\n- Avoid granting Developer-level access broadly — reserve it for platform/IT roles validating integration health, not for day-to-day business users.\n- Any workflow touching guest PII (Salesforce guest profiles, compensation data) requires this same audit pattern plus an explicit approval step before rollout.\n- Document every new integration's access level and shared group in the app's integration list before deployment, not after."
+      }
+    ],
+    "metrics": [
+      {
+        "metric": "Weekly revenue deck refresh time",
+        "target": "Reduce from multi-hour manual pull to on-demand (under 5 minutes)",
+        "how_measured": "Compare time-to-generate export view logs against historical manual pull times reported by the revenue team."
+      },
+      {
+        "metric": "Process continuity during analyst leave",
+        "target": "Zero freeze incidents during Priya's next leave period",
+        "how_measured": "Track whether sell-through and capacity data continues updating (via Snowflake sync logs) without manual intervention while Priya is out."
+      },
+      {
+        "metric": "Dashboard adoption",
+        "target": "80% of Revenue and Ops team members use the dashboard at least weekly within 30 days",
+        "how_measured": "Platform usage/login analytics filtered to the Revenue and Ops user group."
+      },
+      {
+        "metric": "Capacity data accuracy",
+        "target": "Reduce capacity-cap discrepancies flagged by Priya to near zero within 60 days",
+        "how_measured": "Count of manual corrections logged by the analyst role per week, compared to baseline workbook error rate."
+      },
+      {
+        "metric": "Governance sign-off readiness",
+        "target": "Marcus validates access-control and audit-log completeness within the first 14 days",
+        "how_measured": "Governance Admin review checklist completion, confirming audit trail captures all capacity-cap edits with user and timestamp."
+      }
+    ]
+  }
+}
