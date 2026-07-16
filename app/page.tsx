@@ -114,9 +114,9 @@ export default function Home() {
         {view === "start" && (
           <StartView
             onSelectPersona={(p) => runDemo(p)}
-            onRunMaterial={(material) => {
-              lastLive.current = { material, name: "Your material" };
-              runLive(material, "Your material");
+            onRunMaterial={(material, name) => {
+              lastLive.current = { material, name };
+              runLive(material, name);
             }}
           />
         )}

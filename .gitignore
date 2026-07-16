@@ -45,3 +45,6 @@ scripts/.out.*
 
 # playwright QA screenshots
 scripts/.shots/
+
+.vercel
+.env*
